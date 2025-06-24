@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VedhantX Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+ <style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: #0f0f0f;
+    color: #fff;
+    overflow-y: auto;
+  }
+
+  h1, h2 {
+    color: #00f0ff;
+  }
+
+  .user-info {
+    margin-bottom: 20px;
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #0ff3;
+  }
+
+  nav a {
+    margin-right: 15px;
+    color: #f900ff;
+    text-decoration: none;
+  }
+
+  form {
+    margin-top: 15px;
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  input, textarea, button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+  }
+
+  button {
+    background: linear-gradient(90deg, #00f0ff, #f900ff);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px #f900ff;
+  }
+
+  .project-card {
+    background: #1a1a1a;
+    padding: 15px;
+    margin-top: 10px;
+    border-left: 5px solid #00f0ff;
+    border-radius: 8px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #f900ff;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0f0f0f;
+  }
+</style>
+
+</head>
+<body>
+
+  <h1>👨‍💻 Welcome to VedhantX Dashboard</h1>
+
+  <div class="user-info" id="user-info">Loading user info...</div>
+
+  <nav>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a href="report.html">🐞 Reported Bugs</a>
+    <a href="projects.html">💻 Projects</a>
+  </nav>
+
+  <!-- ✅ Bug Submission Form -->
+  <h2>🐞 Submit a Bug</h2>
+  <form id="bugForm">
+    <input type="text" id="bugTitle" placeholder="Bug Title" required />
+    <textarea id="bugDescription" placeholder="Describe the bug..." required></textarea>
+    <button type="submit">Submit Bug</button>
+  </form>
+  <div id="bugSuccessMessage"></div>
+
+  <!-- ✅ Cyberpunk Project Section -->
+  <h2>🚀 Your Cyberpunk Projects</h2>
+  <div class="project-card">🧬 AI Malware Scanner</div>
+  <div class="project-card">💣 Vulnerability Auto-Patcher</div>
+  <div class="project-card">🔍 Smart Recon Tool</div>
+
+  <!-- ✅ Contact Form -->
+  <h2>📩 Submit Query</h2>
+  <form id="queryForm">
+    <textarea id="userQuery" placeholder="Your message..." required></textarea>
+    <button type="submit">Send Query</button>
+  </form>
+
+  <!-- ✅ Logout Button -->
+  <button id="logout-btn" style="margin-top: 30px;">Logout</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDeF0CNfCwXq7Q6ohkcgFlH_44dSqV93u4",
+      authDomain: "bug-hunter-cf495.firebaseapp.com",
+      databaseURL: "https://bug-hunter-cf495-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "bug-hunter-cf495",
+      storageBucket: "bug-hunter-cf495.appspot.com",
+      messagingSenderId: "517122626707",
+      appId: "1:517122626707:web:ad2bbc0ea4d06918f86966",
+      measurementId: "G-MXEN75MSZS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // ✅ Show user info
+    onAuthStateChanged(auth, (user) => {
+      const info = document.getElementById('user-info');
+      if (user) {
+        info.innerHTML = `
+          <strong>UID:</strong> ${user.uid}<br>
+          <strong>Email:</strong> ${user.email || 'N/A'}<br>
+          <strong>Phone:</strong> ${user.phoneNumber || 'N/A'}<br>
+          <strong>Name:</strong> ${user.displayName || 'Not Set'}
+        `;
+      } else {
+        window.location.href = "login.html";
+      }
+    });
+
+    // ✅ Logout
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    });
+
+    // ✅ Bug form submit
+    document.getElementById("bugForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("bugTitle").value;
+      const description = document.getElementById("bugDescription").value;
+      const user = auth.currentUser;
+
+      if (user) {
+        const bugRef = push(ref(db, 'bugs'));
+        set(bugRef, {
+          title,
+          description,
+          uid: user.uid,
+          email: user.email || "N/A"
+        }).then(() => {
+          document.getElementById("bugSuccessMessage").textContent = "✅ Bug submitted!";
+          document.getElementById("bugForm").reset();
+        });
+      }
+    });
+
+    // ✅ Query form submit
+    document.getElementById("queryForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const message = document.getElementById("userQuery").value;
+      const user = auth.currentUser;
+
+      if (user) {
+        const queryRef = push(ref(db, 'queries'));
+        set(queryRef, {
+          message,
+          uid: user.uid,
+          email: user.email || "N/A"
+        }).then(() => {
+          alert("✅ Query sent!");
+          document.getElementById("queryForm").reset();
+        });
+      }
+    });
+  </script>
+<footer style="
+  margin-top: 50px;
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  border-top: 1px solid #333;
+  background: #0f0f0f;">
+  © 2025 <span style="color: #00f0ff;">Vedhant Bidari</span>. All rights reserved.
+</footer>
+
+</body>
+</html>

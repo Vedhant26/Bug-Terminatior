@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BUG-TERMINATION| Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Global Loader -->
+  <div class="global-loader">
+    <span class="dot dot1">.</span>
+    <span class="dot dot2">.</span>
+    <span class="dot dot3">.</span>
+    <p class="loading-text">Loading</p>
+  </div>
+
+  <!-- Hero Section -->
+  <main class="hero">
+    <h1 class="glow">WELCOME TO <span>BUG-TERMINATION</span></h1>
+    <p class="subtitle">A PLACE TO STORE YOUR DATA</p>
+    <button id="enter-btn">Enter</button> <!-- ✅ No onclick -->
+  </main>
+
+  <!-- Background Video -->
+  <video autoplay loop muted id="bg-video">
+    <source src="assets/cyberpunk-bg.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Scripts -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
